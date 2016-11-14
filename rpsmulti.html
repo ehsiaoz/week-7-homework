@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Rock Paper Scissors Multiplayer</title>
+	<script src='http://code.jquery.com/jquery-2.1.3.min.js'></script>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+	<link rel="stylesheet" type="text/css" href="assets/css/style.css">
+</head>
+<body>
+
+<div class="container">
+	
+<!-- The below section contains the header -->
+	<div class="row">
+		<div class="col-sm-12">
+			<div class="page-header">
+			  <h1>Rock Paper Scissors</h1>
+			</div>
+		</div>
+	</div>
+
+<!-- The below section contains the name input section -->
+	<div class="row">
+		<div class="col-sm-12">
+			<form class="navbar-form">
+			  <input type="text" class="span2" id="name-input">
+			  <button type="submit" class="btn">Start</button>
+			</form>
+		</div>
+	</div>
+
+<!-- The below section is the game playing section -->
+	<div class="row">
+		<div class="col-sm-4">
+			<div class="game-block" id="player-1">
+				<h4 class="player-name">Player 1</h4>
+
+			</div>
+		</div>
+		<div class="col-sm-4">
+			<div class="game-block" id="versus">
+						
+			</div>
+		</div>
+		<div class="col-sm-4">
+			<div class="game-block" id="player-2">
+				<h4 class="player-name">Player 2</h4>
+			</div>
+		</div>
+	</div>
+
+<!-- Bootstrap Dialogue Box -->
+	<div class="row">
+		<div class="col-sm-12">
+			<div class="panel panel-default" id="dialogue-box">
+			  <div class="panel-heading">Dialogue Box</div>
+			  <div class="panel-body">
+			    Panel content blah <br/>blah <br/>blah <br/>blah <br/>blah <br/>blah <br/>blah <br/>blah 
+			  </div>
+			</div>
+		</div>
+	</div>
+
+<!-- Text Input -->
+	<div class="row">
+		<div class="col-sm-12">
+			<div id="send-text">
+				<div class="input-group">
+				    <textarea class="form-control custom-control" rows="1" style="resize:none"></textarea>     
+				    <span class="input-group-addon btn btn-primary">Send</span>
+				</div>
+			</div>
+		</div>
+	</div>
+
+<!-- Text Input -->
+	<div class="row">
+		<div class="col-sm-12">
+			<div id="blank">
+				
+			</div>
+		</div>
+	</div>
+
+</div>
+
+<script type="text/javascript" src="rps.js"></script>
+</body>
+</html>
