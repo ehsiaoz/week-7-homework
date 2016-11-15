@@ -28,25 +28,41 @@ var db = firebase.database();
 
 db.ref().on("value", function(snapshot) {
 
-	if (snapshot.child("Player").exists()) {
+		//clicking on start will add player 2
 		$('#add-player').on('click', function() {
 
-			var player2Block = $('#player2');
-			var name = $('#player-input').val().trim();
-			$('#player2').html(name);
+			//if the player node exists 
+			//Need to update so that it not only checks to see exists but limit to only 2
+			if (snapshot.child("player").exists()) {
 
+				var player2Block = $('#player2');
+				var player2Name = $('#player-input').val().trim();
+				$('#player2').html(player2Name);
+				
+				db.ref('player/' + 2).set({
+				    name: player2Name,
+				    wins: 1,
+				    losses: 0,
+				    choice: "",
+				  });
+			}
+
+			else {	
+				//if player node does not exist, then add player 1
+				var player1Block = $('#player1');
+				var player1Name = $('#player-input').val().trim();
+				$('#player1').html(player1Name);
+
+				db.ref('player/' + 1).set({
+				    name: player1Name,
+				    wins: 0,
+				    losses: 0,
+				    choice: "",
+				  });
+
+			}
 		});
-	}
-
-	else {
-			$('#add-player').on('click', function() {
-
-			var player1Block = $('#player1');
-			var name = $('#player-input').val().trim();
-			$('#player1').html(name);
-
-		});
-	}
+	
 });
 
 //Buttons=============
