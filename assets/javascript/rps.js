@@ -28,8 +28,20 @@ var db = firebase.database();
 
 db.ref().on("value", function(snapshot) {
 
+
+
 		//clicking on start will add player 2
 		$('#add-player').on('click', function() {
+
+
+			var playerName = $('#player-input').val().trim();
+
+			var player = {
+				name: playerName,
+				choice: "",
+				wins: 0,
+				losses: 0,
+			};
 
 			//if the player node exists 
 			//Need to update so that it not only checks to see exists but limit to only 2
@@ -39,12 +51,7 @@ db.ref().on("value", function(snapshot) {
 				var player2Name = $('#player-input').val().trim();
 				$('#player2').html(player2Name);
 				
-				db.ref('player/' + 2).set({
-				    name: player2Name,
-				    wins: 1,
-				    losses: 0,
-				    choice: "",
-				  });
+				db.ref('player/' + 2).push(player);
 			}
 
 			else {	
@@ -53,12 +60,7 @@ db.ref().on("value", function(snapshot) {
 				var player1Name = $('#player-input').val().trim();
 				$('#player1').html(player1Name);
 
-				db.ref('player/' + 1).set({
-				    name: player1Name,
-				    wins: 0,
-				    losses: 0,
-				    choice: "",
-				  });
+				db.ref('player/' + 1).push(player);
 
 			}
 		});
