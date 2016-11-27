@@ -1,49 +1,8 @@
-//Initialize Firebase
-
-var config = {
-    apiKey: "AIzaSyABJOLPQITTjuRcwQ0eRvfB0bTN-Z1HTbI",
-    authDomain: "rps-multiplayer-eeb35.firebaseapp.com",
-    databaseURL: "https://rps-multiplayer-eeb35.firebaseio.com",
-    storageBucket: "",
-    messagingSenderId: "111248477940"
-	};
-
-firebase.initializeApp(config);
-
-var db = firebase.database();
-
-
-//DB References===================================
-
-//Detecting changes in player 1 node
-const dbPlayer1 = db.ref().child('players/1');
-
-dbPlayer1.on('value', function(snapshot) {
-
-	console.log("this is player 1 name: " + snapshot.val().name);
-	$('#player1').html(snapshot.val().name)
-	
-
-});
-
-//Detecting changes in player 2 node
-const dbPlayer2 = db.ref().child('players/2');
-
-dbPlayer2.on('value', function(snapshot) {
-
-	console.log("this is player 2 name: " + snapshot.val().name);
-	$('#player2').html(snapshot.val().name)
-	
-
-});
-
-
-
 //Global Variables==============
 
+var isPlayerOneActive = null;
+var isPlayerTwoActive = null;
 
-
-console.log(Boolean(isPlayerOneActive));
 
 //Functions=====
 
@@ -55,42 +14,29 @@ $(document).ready(function(){
 //Clicking on start button will perform a check to see if Player 1 or 2 exists and add respective player
 	$('#add-player').on('click', function(){
 
-		db.ref().on("value", function(snapshot) {
-
+		db.ref().once('value')
+  		.then(function(snapshot) {
+	  			
 			//If there are no players 
-			if(snapshot.child("players/1") == false && snapshot.child("players/2") == false) {
+			if(snapshot.child("players/1").exists() == false && snapshot.child("players/2").exists() == false) {
 
-				isPlayerOneActive = true;
-				addPlayer1();
-			
-				console.log("Player 1 active: " + isPlayerOneActive);
-				console.log("Player 2 active: " + isPlayerTwoActive);
-				
-				console.log("Player 1 name: " + player1);
-				
+				addPlayer1();				
 				return;
+
 			}
 
-			else if (Boolean(isPlayerOneActive) == true && Boolean(isPlayerTwoActive) == false)	{
+			else if (snapshot.child("players/1").exists() == true && snapshot.child("players/2").exists() == false)	{
 
-				isPlayerTwoActive = true;
+
 				addPlayer2();
-				
-				console.log("Player 1 active: " + isPlayerOneActive);
-				console.log("Player 2 active: " + isPlayerTwoActive);
-
 				return;
 
 			}
 
-			else if (Boolean(isPlayerOneActive) == false && Boolean(isPlayerTwoActive) == true)	{
+			else if (snapshot.child("players/1").exists() == false && snapshot.child("players/2").exists() == true)	{
 
-				isPlayerOneActive = true;
+
 				addPlayer1();
-				
-				console.log("Player 1 active: " + isPlayerOneActive);
-				console.log("Player 2 active: " + isPlayerTwoActive);
-
 				return;
 			}
 		});
@@ -137,7 +83,60 @@ function addPlayer2() {
 
 
 
+//Initialize Firebase
 
+var config = {
+    apiKey: "AIzaSyABJOLPQITTjuRcwQ0eRvfB0bTN-Z1HTbI",
+    authDomain: "rps-multiplayer-eeb35.firebaseapp.com",
+    databaseURL: "https://rps-multiplayer-eeb35.firebaseio.com",
+    storageBucket: "",
+    messagingSenderId: "111248477940"
+	};
+
+firebase.initializeApp(config);
+
+var db = firebase.database();
+
+
+//DB References===================================
+
+//Detecting changes in players node
+const dbPlayers = db.ref().child('players');
+
+dbPlayers.on('child_added', function(snapshot) {
+
+	console.log("Child added");
+
+});
+
+// //Detecting changes in player 1 node
+// const dbPlayer1 = db.ref().child('players/1');
+
+// dbPlayer1.on('value', function(snapshot) {
+
+// 	console.log("this is player 1 name: " + snapshot.val().name);
+// 	$('#player1').html(snapshot.val().name)
+	
+
+// });
+
+// //Detecting changes in player 2 node
+// const dbPlayer2 = db.ref().child('players/2');
+
+// dbPlayer2.on('value', function(snapshot) {
+
+// 	console.log("this is player 2 name: " + snapshot.val().name);
+// 	$('#player2').html(snapshot.val().name)
+	
+
+// });
+
+db.ref().on("value", function(snapshot) {
+
+	$('#player1').html(snapshot.child("players/1").val().name);
+	$('#player2').html(snapshot.child("players/2").val().name);
+
+});
 
 //Functions===========
 
