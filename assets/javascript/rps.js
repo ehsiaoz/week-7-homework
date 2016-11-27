@@ -1,4 +1,58 @@
 
+//Global Variables
+
+
+
+
+
+//Functions
+
+
+
+$(document).ready(function(){
+
+	//clicking on start will add player 2
+		$('#add-player').on('click', function() {
+
+
+			var playerName = $('#player-input').val().trim();
+
+			var player = {
+				name: playerName,
+				choice: "",
+				wins: 0,
+				losses: 0,
+			};
+
+			//if the player node exists 
+			//Need to update so that it not only checks to see exists but limit to only 2
+			if (snapshot.child("players").exists()) {
+
+				var player2Block = $('#player2');
+				var player2Name = $('#player-input').val().trim();
+				$('#player2').html(player2Name);
+				
+				db.ref('players').push(player);
+			}
+
+			else {	
+				//if player node does not exist, then add player 1
+				var player1Block = $('#player1');
+				var player1Name = $('#player-input').val().trim();
+				$('#player1').html(player1Name);
+
+				db.ref('players').push(player);
+
+			}
+		});
+
+
+
+
+
+
+
+}) ;
 //Initialize Firebase
 
 var config = {
@@ -30,42 +84,9 @@ db.ref().on("value", function(snapshot) {
 
 
 
-		//clicking on start will add player 2
-		$('#add-player').on('click', function() {
-
-
-			var playerName = $('#player-input').val().trim();
-
-			var player = {
-				name: playerName,
-				choice: "",
-				wins: 0,
-				losses: 0,
-			};
-
-			//if the player node exists 
-			//Need to update so that it not only checks to see exists but limit to only 2
-			if (snapshot.child("player").exists()) {
-
-				var player2Block = $('#player2');
-				var player2Name = $('#player-input').val().trim();
-				$('#player2').html(player2Name);
-				
-				db.ref('player/' + 2).push(player);
-			}
-
-			else {	
-				//if player node does not exist, then add player 1
-				var player1Block = $('#player1');
-				var player1Name = $('#player-input').val().trim();
-				$('#player1').html(player1Name);
-
-				db.ref('player/' + 1).push(player);
-
-			}
-		});
-	
 });
+
+
 
 //Buttons=============
 
