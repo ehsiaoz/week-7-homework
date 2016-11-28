@@ -27,6 +27,16 @@ $(document).ready(function(){
 		db.ref('players').push(player);
 	});
 
+	$('#logout').on('click', function(){
+		
+		firebase.auth().signOut().then(function() {
+		
+			console.log("signout");	
+		});
+		
+	
+	});
+
 //document.ready() closing
 }); 
 
@@ -50,11 +60,14 @@ var db = firebase.database();
 firebase.auth().onAuthStateChanged(function(user) {
 	if (user) {
 		var signInAnonymous = user.signInAnonymous;
-		var uid = user.uid;
+		uid = user.uid;
 		console.log('uid', uid);
+		console.log('user', user);
 	}
 
 	else {
 
 	}
 });
+
+
