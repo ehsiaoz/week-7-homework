@@ -43,28 +43,44 @@ $(document).ready(function(){
 		});
 	});
 
-
+	$('#logout').on('click', function(){
+		
+		firebase.auth().signOut().then(function() {
+		
+			console.log("signout");	
+		});
+		
+	
+	});
 
 
 //function to add player 1
 function addPlayer1() {
 
-	var playerName = $('#player-input').val().trim();
+	firebase.auth().signInAnonymously().catch(function(error) {
 
-	var player = {
-		name: playerName,
-		choice: "",
-		wins: 0,
-		losses: 0,
-	};
+			var errorCode = error.code;
+			var errorMessage = errorMessage;
+		});
 
-	firebase.auth().signInAnonymously()
+		var playerName = $('#player-input').val().trim();
+		var userID = firebase.auth().currentUser.uid;
 
-	.then(function(user) {
-		user.updateProfile({playerName: playerName.value});
-	});
+		var player = {
+			name: playerName,
+			choice: "",
+			wins: 0,
+			losses: 0,
+			uid: "",
+			
+		};
 
-	db.ref('players/1').set(player);
+		
+		db.ref('players/1').set(player);
+		db.ref('players/1').update({
+			uid: userID,
+		});
+	
 
 
 	console.log(player);
@@ -73,20 +89,23 @@ function addPlayer1() {
 //function to add player 2 (investigate later if i can remove this redundant code)
 function addPlayer2() {
 
-	var playerName = $('#player-input').val().trim();
+	firebase.auth().signInAnonymously().catch(function(error) {
 
-	var player = {
-		name: playerName,
-		choice: "",
-		wins: 0,
-		losses: 0,
-	};
+			var errorCode = error.code;
+			var errorMessage = errorMessage;
+		});
 
-	firebase.auth().signInAnonymously()
+		var playerName = $('#player-input').val().trim();
+		var user = firebase.auth().currentUser;
 
-	.then(function(user) {
-		user.updateProfile({playerName: playerName.value});
-	});
+		var player = {
+			name: playerName,
+			choice: "",
+			wins: 0,
+			losses: 0,
+			uid: "",
+			
+		};
 	
 	db.ref('players/2').set(player);
 	db.ref('turn').set(1);
@@ -96,19 +115,19 @@ function addPlayer2() {
 
 
 
-//Initialize Firebase
+// //Initialize Firebase
 
-var config = {
-    apiKey: "AIzaSyB4UG3Fq7Z__3F2wXAMVloImoh31iRyNXQ",
-    authDomain: "rps-multi-2.firebaseapp.com",
-    databaseURL: "https://rps-multi-2.firebaseio.com",
-    storageBucket: "rps-multi-2.appspot.com",
-    messagingSenderId: "858193553121"
-  };
+// var config = {
+//     apiKey: "AIzaSyB4UG3Fq7Z__3F2wXAMVloImoh31iRyNXQ",
+//     authDomain: "rps-multi-2.firebaseapp.com",
+//     databaseURL: "https://rps-multi-2.firebaseio.com",
+//     storageBucket: "rps-multi-2.appspot.com",
+//     messagingSenderId: "858193553121"
+//   };
 
-  firebase.initializeApp(config);
+//   firebase.initializeApp(config);
 
-var db = firebase.database();
+// var db = firebase.database();
 
 
 //DB References===================================
@@ -162,12 +181,36 @@ db.ref().on("value", function(snapshot) {
 // });
 
 
-const auth = firebase.auth();
-
-
-
 
 
 
 //document.ready() closing
 }); 
+
+//Initialize Firebase
+
+var config = {
+    apiKey: "AIzaSyB4UG3Fq7Z__3F2wXAMVloImoh31iRyNXQ",
+    authDomain: "rps-multi-2.firebaseapp.com",
+    databaseURL: "https://rps-multi-2.firebaseio.com",
+    storageBucket: "rps-multi-2.appspot.com",
+    messagingSenderId: "858193553121"
+  };
+
+  firebase.initializeApp(config);
+
+var db = firebase.database();
+
+
+firebase.auth().onAuthStateChanged(function(user) {
+	if (user) {
+		var signInAnonymous = user.signInAnonymous;
+		var uid = user.uid;
+		console.log('uid', uid);
+		console.log('user', user);
+	}
+
+	else {
+
+	}
+});

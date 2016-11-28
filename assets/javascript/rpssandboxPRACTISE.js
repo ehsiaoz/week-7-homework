@@ -8,22 +8,25 @@ $(document).ready(function(){
 
 	$('#add-player').on('click', function(){
 
-
-		var playerName = $('#player-input').val().trim();
-
-		var player = {
-			name: playerName,
-			choice: "",
-			wins: 0,
-			losses: 0,
-		};
-
 		firebase.auth().signInAnonymously().catch(function(error) {
 
 			var errorCode = error.code;
 			var errorMessage = errorMessage;
 		});
 
+		var playerName = $('#player-input').val().trim();
+		var user = firebase.auth().currentUser;
+
+		var player = {
+			name: playerName,
+			choice: "",
+			wins: 0,
+			losses: 0,
+			uid: "",
+			
+		};
+
+		
 		db.ref('players').push(player);
 	});
 
@@ -60,7 +63,7 @@ var db = firebase.database();
 firebase.auth().onAuthStateChanged(function(user) {
 	if (user) {
 		var signInAnonymous = user.signInAnonymous;
-		uid = user.uid;
+		var uid = user.uid;
 		console.log('uid', uid);
 		console.log('user', user);
 	}
