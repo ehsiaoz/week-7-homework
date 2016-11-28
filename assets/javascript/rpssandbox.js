@@ -96,7 +96,7 @@ function addPlayer2() {
 		});
 
 		var playerName = $('#player-input').val().trim();
-		var user = firebase.auth().currentUser;
+		var userID = firebase.auth().currentUser.uid;
 
 		var player = {
 			name: playerName,
@@ -108,6 +108,9 @@ function addPlayer2() {
 		};
 	
 	db.ref('players/2').set(player);
+	db.ref('players/1').update({
+			uid: userID,
+		});
 	db.ref('turn').set(1);
 
 	console.log(player);
