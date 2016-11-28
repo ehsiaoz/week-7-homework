@@ -1,7 +1,7 @@
-//Global Variables==============
+// Global Variables==============
 
 
-//Functions=====
+// Functions=====
 
 $(document).ready(function(){
 
@@ -9,22 +9,27 @@ $(document).ready(function(){
 	$('#add-player').on('click', function(){
 
 
-	var playerName = $('#player-input').val().trim();
+		var playerName = $('#player-input').val().trim();
 
-	var player = {
-		name: playerName,
-		choice: "",
-		wins: 0,
-		losses: 0,
-	};
+		var player = {
+			name: playerName,
+			choice: "",
+			wins: 0,
+			losses: 0,
+		};
 
-	firebase.auth().signInAnonymously()
+		firebase.auth().signInAnonymously().catch(function(error) {
 
-	.then(function(user) {
-		user.updateProfile({playerName: playerName.value});
+			var errorCode = error.code;
+			var errorMessage = errorMessage;
+		});
+
+		db.ref('players').push(player);
 	});
 
-});
+//document.ready() closing
+}); 
+
 
 
 //Initialize Firebase
@@ -41,5 +46,15 @@ var config = {
 
 var db = firebase.database();
 
-//document.ready() closing
-}); 
+
+firebase.auth().onAuthStateChanged(function(user) {
+	if (user) {
+		var signInAnonymous = user.signInAnonymous;
+		var uid = user.uid;
+		console.log('uid', uid);
+	}
+
+	else {
+
+	}
+});
