@@ -14,6 +14,7 @@ $(document).ready(function(){
 //Clicking on start button will perform a check to see if Player 1 or 2 exists and add respective player
 	$('#add-player').on('click', function(){
 
+
 		db.ref().once('value')
   		.then(function(snapshot) {
 	  			
@@ -57,6 +58,12 @@ function addPlayer1() {
 		losses: 0,
 	};
 
+	firebase.auth().signInAnonymously()
+
+	.then(function(user) {
+		user.updateProfile({playerName: playerName.value});
+	});
+
 	db.ref('players/1').set(player);
 
 
@@ -75,6 +82,12 @@ function addPlayer2() {
 		losses: 0,
 	};
 
+	firebase.auth().signInAnonymously()
+
+	.then(function(user) {
+		user.updateProfile({playerName: playerName.value});
+	});
+	
 	db.ref('players/2').set(player);
 	db.ref('turn').set(1);
 
@@ -86,14 +99,14 @@ function addPlayer2() {
 //Initialize Firebase
 
 var config = {
-    apiKey: "AIzaSyABJOLPQITTjuRcwQ0eRvfB0bTN-Z1HTbI",
-    authDomain: "rps-multiplayer-eeb35.firebaseapp.com",
-    databaseURL: "https://rps-multiplayer-eeb35.firebaseio.com",
-    storageBucket: "",
-    messagingSenderId: "111248477940"
-	};
+    apiKey: "AIzaSyB4UG3Fq7Z__3F2wXAMVloImoh31iRyNXQ",
+    authDomain: "rps-multi-2.firebaseapp.com",
+    databaseURL: "https://rps-multi-2.firebaseio.com",
+    storageBucket: "rps-multi-2.appspot.com",
+    messagingSenderId: "858193553121"
+  };
 
-firebase.initializeApp(config);
+  firebase.initializeApp(config);
 
 var db = firebase.database();
 
@@ -147,6 +160,13 @@ db.ref().on("value", function(snapshot) {
 // dbPlayer1.on("value", function(snapshot) {
 // 	console.log(snapshot.val);
 // });
+
+
+const auth = firebase.auth();
+
+
+
+
 
 
 //document.ready() closing
