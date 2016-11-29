@@ -1,7 +1,7 @@
 
+$(document).ready(function(){
 
-//Initialize Firebase
-
+//Initialize Firebase==================
 var config = {
     apiKey: "AIzaSyB4UG3Fq7Z__3F2wXAMVloImoh31iRyNXQ",
     authDomain: "rps-multi-2.firebaseapp.com",
@@ -12,15 +12,47 @@ var config = {
 
   firebase.initializeApp(config);
 
+//database references===================
 var db = firebase.database();
+var dbCurrentPlayer = db.ref("players/" + currentUser);
+var dbOpponent = db.ref("players/2") //<=== This needs to be corrected
 
 // Global Variables==============
 
-var currentUser = "";
+var activePlayer = ""
+
+//Database listeners=============================
+
+dbCurrentPlayer.on("value", function(snapshot) {
+
+	
+	var player = {
+			name: snapshot.child("name").val(),
+			choice: snapshot.child("ties").val(),
+			wins: snapshot.child("wins").val(),
+			losses: snapshot.child("losses").val(),
+			ties: snapshot.child("ties").val()
+		}
+			
+});
+
+dbOpponent.on("value", function(snapshot) {
+
+	
+	var player = {
+			name: snapshot.child("name").val(),
+			// choice: snapshot.child("ties").val(),
+			wins: snapshot.child("wins").val(),
+			losses: snapshot.child("losses").val(),
+			ties: snapshot.child("ties").val()
+		}
+			
+});
+
 
 // Functions=====
 
-$(document).ready(function(){
+
 
 
 	$('#add-player').on('click', function(){
@@ -78,15 +110,6 @@ $(document).ready(function(){
 		
 	});
 
-	$('#logout').on('click', function(){
-		
-		firebase.auth().signOut().then(function() {
-		
-			console.log("signout");	
-		});
-		
-	
-	});
 
 //document.ready() closing
 }); 
