@@ -76,10 +76,10 @@ function addPlayer1() {
 		};
 
 		
-		db.ref('players/1').set(player);
-		db.ref('players/1').update({
-			uid: userID,
-		});
+		db.ref('players').push(player);
+		// db.ref('players/1').update({
+		// 	uid: userID,
+		// });
 	
 
 
@@ -107,7 +107,7 @@ function addPlayer2() {
 			
 		};
 	
-	db.ref('players/2').set(player);
+	db.ref('players').push(player);
 	db.ref('players/1').update({
 			uid: userID,
 		});
