@@ -29,3 +29,15 @@
 #blank {
 	height: 50px;
 }
+
+#greeting {
+	text-align: center;
+	margin-bottom: 5px;
+	font-weight: bold;
+}
+
+#turn-indicator {
+	text-align: center;
+	margin-bottom: 5px;
+	font-weight: bold;
+}

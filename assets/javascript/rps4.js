@@ -10,10 +10,9 @@ var player = {
 		};
 
 var currentPlayer = null;
+var opponentPlayer = null;
 
-$(document).ready(function(){
-
-	//Initialize Firebase==================
+//Initialize Firebase==================
 	var config = {
 	    apiKey: "AIzaSyB4UG3Fq7Z__3F2wXAMVloImoh31iRyNXQ",
 	    authDomain: "rps-multi-2.firebaseapp.com",
@@ -29,12 +28,63 @@ $(document).ready(function(){
 	var dbPlayer1 = db.ref("players/1");
 	var dbPlayer2 = db.ref("players/2");
 
+//Functions
+
+var startGame = function() {
+
 	db.ref().on("value", function(snapshot) {
 
-		var player1Name = snapshot.child("players/1").val().name;
-		$('#player1').html(player1Name);
-		var player2Name = snapshot.child("players/2").val().name;
-		$('#player2').html(player2Name);
+	console.log("turn" + snapshot.child("turn").val());
+	// //Code to change color of player boxes
+	
+					var turn = snapshot.child("turn").val();
+					console.log("turn: " + turn);
+					
+					if (turn === 1) {
+
+						$('#player-1').css({"border": "2px solid blue"});	
+					}
+					
+					if (turn === currentPlayer) {
+						$('#turn-indicator').html("It's Your Turn!");
+					}
+
+					if (turn !== currentPlayer) {
+						$('#turn-indicator').html("Waiting for opponent to choose");	
+					}
+
+					else if (turn === 2) {
+
+						$('#player-2').css({"border": "2px solid blue"});
+
+					}
+				});
+
+};
+
+$(document).ready(function(){
+
+	
+
+	db.ref().on("value", function(snapshot) {
+
+		if(snapshot.child("players/1").exists() === true) {
+			var player1Name = snapshot.child("players/1").val().name;
+			$('#player1').html(player1Name);
+		}
+		
+		if(snapshot.child("players/1").exists() === true) {
+			var player2Name = snapshot.child("players/2").val().name;
+			$('#player2').html(player2Name);
+		}
+		
+
+		if(snapshot.child("players/1").exists() === true && snapshot.child("players/2").exists() === true) {
+			
+			startGame();
+		
+		}
+
 
 	});
 
@@ -58,6 +108,9 @@ $(document).ready(function(){
 
 						db.ref('players/1/').update(player);
 						currentPlayer = 1;
+						opponentPlayer = 2;
+						$('#bar-button').hide();
+						$('#greeting').html("Hi " + player.name + "! You are player " + currentPlayer);
 						return;
 
 				}
@@ -66,18 +119,27 @@ $(document).ready(function(){
 
 
 						db.ref('players/2/').update(player);
+						db.ref('turn').set(1);
 						currentPlayer = 2;
+						opponentPlayer = 1;
+						$('#bar-button').hide();
+						$('#greeting').html("Hi " + player.name + "! You are player " + currentPlayer);
+						
 						return;
 
-				}
 
+				}
 				else {
 						
-					alert("Game is already in session");
+					alert("Sorry. Game is already in session");
 
 						return;
 				}
-		});
+
+				
+			});
 	});
 
 });
+
+
