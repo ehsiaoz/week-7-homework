@@ -42,11 +42,30 @@ var startGame = function() {
 					
 					if (turn === 1) {
 
-						$('#player-1').css({"border": "2px solid blue"});	
+						$('#player-1').css({
+							"border": "2px solid blue"
+						});
+						
 					}
 					
 					if (turn === currentPlayer) {
 						$('#turn-indicator').html("It's Your Turn!");
+					}
+
+					if (turn === 1 && currentPlayer ===1) {
+						$('#player1choices').css({
+							"display": "block"});
+
+						$('#player2choices').css({
+							"display": "none"})
+					}
+
+					if (turn === 2 && currentPlayer === 2) {
+						$('#player2choices').css({
+							"display": "block"});
+
+						$('#player1choices').css({
+							"display": "none"})
 					}
 
 					if (turn !== currentPlayer) {
