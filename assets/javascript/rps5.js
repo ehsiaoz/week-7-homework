@@ -30,6 +30,7 @@ var currPlayer = null;
 var oppPlayer = null;
 var numPlayers = null;
 var opponentName = "";
+var choicesSelected = 0;
 
 $(document).ready(function(){
 
@@ -51,6 +52,15 @@ $(document).ready(function(){
 			startGame();
 		}
 	});
+
+	//Check whether both players have selected a choice
+	db.ref('choice_selections').on("value", function(snapshot) {
+		var choices = snapshot.val();
+		if (choices === 2) {
+			compareChoices();
+		}
+	});
+	
 
 });
 
@@ -138,10 +148,14 @@ function startGame() {
 
 	$('.wl').css("visibility", "visible");
 	//Set turn to 1
+	db.ref('choice_selections').set(choicesSelected);
 	db.ref('turn').set(1);
+
 
 	db.ref('turn').on("value", function(snapshot) {
 		turn = snapshot.val();
+
+	//set a tracker to detect whether both players have selected choices
 
 		//if it is the players turn
 		if (turn === currPlayer) {
@@ -184,12 +198,20 @@ function selectChoice() {
 	var dbChoice = db.ref('players/' + currPlayer + '/choice');
 	dbChoice.set(choice);
 
+	//Update DB choice counter to indicate that player has made a choice
+	var dbChoicesSelected = db.ref('choice_selections');
+	dbChoicesSelected.once('value', function(snapshot) {
+		choicesSelected = snapshot.val();
+		choicesSelected++;
+		db.ref('choice_selections').set(choicesSelected);
+	});
 	//Hide the choices
 	$('#playerChoices').css("visibility", "hidden");
 
+
 	//Swith the turn
-	var turn = db.ref('turn');
-	turn.on('value', function(snapshot) {
+	var dbturn = db.ref('turn');
+	dbturn.once('value', function(snapshot) {
 		var currentTurn = snapshot.val();
 		
 		if (currentTurn === 1) {
@@ -200,10 +222,56 @@ function selectChoice() {
 			db.ref('turn').set(1);
 		}
 	});
-	
+
+
 };
 
+function compareChoices() {
 
+	db.ref().once("value", function(snapshot) {
+
+	var playerChoice = snapshot.child('players/' + currPlayer + '/choice').val();
+	var opponentChoice = snapshot.child('players/' + oppPlayer + '/choice').val();
+
+	console.log("Player choice: " + playerChoice);
+	console.log("Opponent choice: " + opponentChoice);
+	
+	if ((playerChoice === "Rock" && opponentChoice === "Scissors") ||
+		(playerChoice === "Paper" && opponentChoice === "Rock") ||
+		(playerChoice === "Scissors" && opponentChoice === "Paper")) {
+
+		console.log("Player Wins!");
+
+		return
+	}
+
+	else if ((playerChoice === "Rock" && opponentChoice === "Rock") ||
+		(playerChoice === "Paper" && opponentChoice === "Paper") ||
+		(playerChoice === "Scissors" && opponentChoice === "Scissors")) {
+
+		console.log("Tie!");
+
+		return
+	}
+	// else if ((playerChoice === "Scissors" && opponentChoice === "Rock") ||
+	// 	(playerChoice === "Rock" && opponentChoice === "Scissors") ||
+	// 	(playerChoice === "Paper" && opponentChoice === "Scissors")) {
+		
+	// 	console.log("You Lose!");	
+	// 	return
+	// }
+
+	// else if ((playerChoice === "Scissors" && opponentChoice === "Scissors") ||
+	// 	(playerChoice === "Rock" && opponentChoice === "Rock") ||
+	// 	(playerChoice === "Paper" && opponentChoice === "Paper")) {
+		
+	// 	console.log("You Tie!");	
+	// 	return
+	// }
+	console.log("You Lose");
+
+	});
+}
 
 function sendChat() {
 
