@@ -42,6 +42,9 @@ $(document).ready(function(){
 	//select choice
 	$('li').on('click', selectChoice);
 
+	//chat send button
+	$('#send').on('click', sendChat);
+
 
 	//Event Listeners==================================
 
@@ -165,6 +168,9 @@ function startGame() {
 			$('#playerBlock').css({
 				"border": "2px solid blue"
 			});
+			$('#oppBlock').css({
+				"border": "1px solid grey"
+			});
 			//Notify the player it is their turn
 			$('#turn-indicator').html("It's Your Turn!");
 		}
@@ -174,6 +180,9 @@ function startGame() {
 			//highlight the opponent's block
 			$('#oppBlock').css({
 				"border": "2px solid blue"
+			});
+			$('#playerBlock').css({
+				"border": "1px solid grey"
 			});
 			//hide the player's choices
 			$('#playerChoices').css("visibility", "hidden");
@@ -230,51 +239,63 @@ function compareChoices() {
 
 	db.ref().once("value", function(snapshot) {
 
-	var playerChoice = snapshot.child('players/' + currPlayer + '/choice').val();
-	var opponentChoice = snapshot.child('players/' + oppPlayer + '/choice').val();
-
-	console.log("Player choice: " + playerChoice);
-	console.log("Opponent choice: " + opponentChoice);
-	
-	if ((playerChoice === "Rock" && opponentChoice === "Scissors") ||
-		(playerChoice === "Paper" && opponentChoice === "Rock") ||
-		(playerChoice === "Scissors" && opponentChoice === "Paper")) {
-
-		console.log("Player Wins!");
-
-		return
-	}
-
-	else if ((playerChoice === "Rock" && opponentChoice === "Rock") ||
-		(playerChoice === "Paper" && opponentChoice === "Paper") ||
-		(playerChoice === "Scissors" && opponentChoice === "Scissors")) {
-
-		console.log("Tie!");
-
-		return
-	}
-	// else if ((playerChoice === "Scissors" && opponentChoice === "Rock") ||
-	// 	(playerChoice === "Rock" && opponentChoice === "Scissors") ||
-	// 	(playerChoice === "Paper" && opponentChoice === "Scissors")) {
+		var playerName = snapshot.child('players/' + currPlayer + '/name').val();
+		var playerChoice = snapshot.child('players/' + currPlayer + '/choice').val();
+		var playerWins = snapshot.child('players/' + currPlayer + '/wins').val();
+		var playerLosses = snapshot.child('players/' + currPlayer + '/losses').val();
+		var opponentName = snapshot.child('players/' + oppPlayer + '/name').val();
+		var opponentChoice = snapshot.child('players/' + oppPlayer + '/choice').val();
+		var oppWins = snapshot.child('players/' + oppPlayer + '/wins').val();
+		var oppLosses = snapshot.child('players/' + oppPlayer + '/losses').val();
+		var dbChoicesSelected = db.ref('choice_selections');
 		
-	// 	console.log("You Lose!");	
-	// 	return
-	// }
+		if ((playerChoice === "Rock" && opponentChoice === "Scissors") ||
+			(playerChoice === "Paper" && opponentChoice === "Rock") ||
+			(playerChoice === "Scissors" && opponentChoice === "Paper")) {
 
-	// else if ((playerChoice === "Scissors" && opponentChoice === "Scissors") ||
-	// 	(playerChoice === "Rock" && opponentChoice === "Rock") ||
-	// 	(playerChoice === "Paper" && opponentChoice === "Paper")) {
+			//Update Player Wins in Firebase
+			playerWins++;
+			db.ref('players/' + currPlayer + '/wins').set(playerWins);
+			$('#vsText').html(playerName + " Wins!");
+		}
+
+		else if ((playerChoice === "Rock" && opponentChoice === "Rock") ||
+			(playerChoice === "Paper" && opponentChoice === "Paper") ||
+			(playerChoice === "Scissors" && opponentChoice === "Scissors")) {
+			$('#vsText').html("Tie Game!");
+		}
 		
-	// 	console.log("You Tie!");	
-	// 	return
-	// }
-	console.log("You Lose");
-
+		else {
+			console.log("You Lose");
+			//Update Player Losses in Firebase
+			playerLosses++;
+			db.ref('players/' + currPlayer + '/losses').set(playerLosses);
+			//Update DOM with Player/Opponent Wins/Losses
+			$('#vsText').html(opponentName + " Wins!");
+		}
+		//reset choices selection counter to 0
+		dbChoicesSelected.set(0);
+		//Update DOM with Player/Opponent Wins/Losses
+		db.ref().once("value", function(snapshot) {
+			var playerWins = snapshot.child('players/' + currPlayer + '/wins').val();
+			var playerLosses = snapshot.child('players/' + currPlayer + '/losses').val();
+			var oppWins = snapshot.child('players/' + oppPlayer + '/wins').val();
+			var oppLosses = snapshot.child('players/' + oppPlayer + '/losses').val();
+			$('#playerWL').html("Wins: " + playerWins + " Losses: " + playerLosses);
+			$('#oppWL').html("Wins: " + oppWins + " Losses: " + oppLosses);
+			console.log("Opponent Wins: " + oppWins + " Opponent Losses: " + oppLosses);
+		});
 	});
+
+
 }
 
 function sendChat() {
 
+	var message = $('#chatInput').val();
+	var chat = "<p>" + player.name + ": " + message + "</p>";
+	var chatHistory = $('#chatHistory')
+	chatHistory.append(chat);
 };
 
 
