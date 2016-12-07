@@ -1,0 +1,69 @@
+
+.page-header {
+	text-align: center;
+}
+
+#bar-button {
+	text-align: center;
+	margin-bottom: 20px;
+}
+
+.game-block {
+	width: 100%;
+	height: 200px;
+	border: 1px solid grey;
+	text-align: center;
+}
+
+#dialogue-box {
+	margin-top: 20px;
+	width: 50%;
+	margin-left: 25%;
+}
+
+.input-group {
+	margin-left: 25%;
+	width: 50%;
+}
+
+#blank {
+	height: 50px;
+}
+
+#greeting {
+	text-align: center;
+	margin-bottom: 5px;
+	font-weight: bold;
+}
+
+h4 {
+	font-size: 30px;
+}
+
+#turn-indicator {
+	text-align: center;
+	margin-bottom: 5px;
+	font-weight: bold;
+}
+
+ul {
+	list-style-type: none;
+	font-size: 20px;
+	padding-left: 0;
+	visibility: hidden;;
+    
+}
+
+li { 
+	cursor: pointer; 
+}
+
+li:hover {
+	background-color: #E3E3E3;
+	poin
+}
+
+.wl {
+	
+	visibility: hidden;;
+}
