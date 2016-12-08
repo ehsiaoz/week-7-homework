@@ -12,8 +12,6 @@
 
 	//database references===================
 	var db = firebase.database();
-	var dbPlayer1 = db.ref("players/1");
-	var dbPlayer2 = db.ref("players/2");
 	var dbPlayerCount = db.ref('player_count')
 
 
@@ -45,16 +43,6 @@ $(document).ready(function(){
 	//chat send button
 	$('#send').on('click', sendChat);
 
-	//clicking enter to trigger page search button click
-	$("input").keypress(function(event) {
-
-	  // listen to see that key was "enter."
-	  if (event.which === 13) {
-
-	    // If so, run addTask.
-	    pagesearchclick();
-	  }
-	});
 
 	//Event Listeners==================================
 
@@ -66,14 +54,9 @@ $(document).ready(function(){
 		}
 	});
 
-	//Check whether both players have selected a choice
-	// var dbChat = db.ref().child(Chat);
-	// chathistory.on('child_added', function(data) {
-	// 	console.log("This is child added data: ", data);
-	// });
 
 	//Listening for changes in 'searches' node in firebase so display recent searches to user
-  db.ref('Chat').on('value', function(snapshot) {
+  	db.ref('Chat').on('value', function(snapshot) {
   		$('#chatHistory').empty();
   		chathistory = [];
 
@@ -88,14 +71,9 @@ $(document).ready(function(){
   			$('#chatHistory').append(eachMessage);
   		}); 			
 
-  });
+  	});
 
-
-
-
-
-
-	
+  	//Check whether both players have selected a choice
 	db.ref('choice_selections').on("value", function(snapshot) {
 		var choices = snapshot.val();
 		if (choices === 2) {
@@ -297,19 +275,20 @@ function compareChoices() {
 			$('#vsText').html(playerName + " Wins!");
 		}
 
-		else if ((playerChoice === "Rock" && opponentChoice === "Rock") ||
-			(playerChoice === "Paper" && opponentChoice === "Paper") ||
-			(playerChoice === "Scissors" && opponentChoice === "Scissors")) {
-			$('#vsText').html("Tie Game!");
-		}
-		
-		else {
-			console.log("You Lose");
+		else if ((playerChoice === "Scissors" && opponentChoice === "Rock") ||
+			(playerChoice === "Rock" && opponentChoice === "Paper") ||
+			(playerChoice === "Paper" && opponentChoice === "Scissors")) {
 			//Update Player Losses in Firebase
 			playerLosses++;
 			db.ref('players/' + currPlayer + '/losses').set(playerLosses);
 			//Update DOM with Player/Opponent Wins/Losses
 			$('#vsText').html(opponentName + " Wins!");
+
+		}
+		
+		else {
+
+			$('#vsText').html("Tie Game!");
 		}
 		//reset choices selection counter to 0
 		dbChoicesSelected.set(0);
@@ -319,9 +298,10 @@ function compareChoices() {
 			var playerLosses = snapshot.child('players/' + currPlayer + '/losses').val();
 			var oppWins = snapshot.child('players/' + oppPlayer + '/wins').val();
 			var oppLosses = snapshot.child('players/' + oppPlayer + '/losses').val();
-			$('#playerWL').html("Wins: " + playerWins + " Losses: " + playerLosses);
 			$('#oppWL').html("Wins: " + oppWins + " Losses: " + oppLosses);
+			$('#playerWL').html("Wins: " + playerWins + " Losses: " + playerLosses);
 			console.log("Opponent Wins: " + oppWins + " Opponent Losses: " + oppLosses);
+			console.log("Player Wins: " + playerWins + " Player Losses: " + playerLosses);
 		});
 	});
 
