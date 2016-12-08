@@ -45,6 +45,16 @@ $(document).ready(function(){
 	//chat send button
 	$('#send').on('click', sendChat);
 
+	//clicking enter to trigger page search button click
+	$("input").keypress(function(event) {
+
+	  // listen to see that key was "enter."
+	  if (event.which === 13) {
+
+	    // If so, run addTask.
+	    pagesearchclick();
+	  }
+	});
 
 	//Event Listeners==================================
 
@@ -57,13 +67,41 @@ $(document).ready(function(){
 	});
 
 	//Check whether both players have selected a choice
+	// var dbChat = db.ref().child(Chat);
+	// chathistory.on('child_added', function(data) {
+	// 	console.log("This is child added data: ", data);
+	// });
+
+	//Listening for changes in 'searches' node in firebase so display recent searches to user
+  db.ref('Chat').on('value', function(snapshot) {
+  		$('#chatHistory').empty();
+  		chathistory = [];
+
+  		//loop through array returned by firebase
+  		snapshot.forEach(function(childSnapshot) {
+  			//creating an array with the search saved search terms from firebase
+  			chathistory.push(childSnapshot.val());
+  		});
+  		//loop through the array and append search term to Recent Searches div.
+  		chathistory.forEach(function(item, i) {
+  			var eachMessage = "<p>" + chathistory[i].name + ": " + chathistory[i].message + "</p>";
+  			$('#chatHistory').append(eachMessage);
+  		}); 			
+
+  });
+
+
+
+
+
+
+	
 	db.ref('choice_selections').on("value", function(snapshot) {
 		var choices = snapshot.val();
 		if (choices === 2) {
 			compareChoices();
 		}
 	});
-	
 
 });
 
@@ -293,9 +331,19 @@ function compareChoices() {
 function sendChat() {
 
 	var message = $('#chatInput').val();
-	var chat = "<p>" + player.name + ": " + message + "</p>";
-	var chatHistory = $('#chatHistory')
-	chatHistory.append(chat);
+	var chat = {
+		name: player.name,
+		message: message,
+		time: firebase.database.ServerValue.TIMESTAMP
+	};
+	
+	db.ref().once('value').then(function(snapshot) {
+
+			db.ref('Chat/').push(chat);
+	});
+
+	$('#chatInput').val("");
+
 };
 
 

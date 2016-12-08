@@ -1,7 +1,12 @@
 
 .page-header {
 	text-align: center;
+	background-color: #5886A1;
+	line-height: 49px;
+	font-size: 30px;
+	color: white;
 }
+
 
 #bar-button {
 	text-align: center;
@@ -19,6 +24,10 @@
 	margin-top: 20px;
 	width: 50%;
 	margin-left: 25%;
+}
+
+#chatTitle {
+	font-weight: bolder;
 }
 
 .input-group {
@@ -46,6 +55,15 @@ h4 {
 	font-weight: bold;
 }
 
+#vsText {
+	line-height: 130px;
+	font-weight: bold;
+}
+
+.player-name {
+	font-weight: bold;
+}
+
 ul {
 	list-style-type: none;
 	font-size: 20px;
@@ -59,7 +77,7 @@ li {
 }
 
 li:hover {
-	background-color: #E3E3E3;
+	background-color: #b58ebf;
 	poin
 }
 
