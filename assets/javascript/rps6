@@ -12,6 +12,8 @@
 
 	//database references===================
 	var db = firebase.database();
+	var dbPlayer1 = db.ref("players/1");
+	var dbPlayer2 = db.ref("players/2");
 	var dbPlayerCount = db.ref('player_count')
 
 
@@ -43,6 +45,16 @@ $(document).ready(function(){
 	//chat send button
 	$('#send').on('click', sendChat);
 
+	//clicking enter to trigger page search button click
+	$("input").keypress(function(event) {
+
+	  // listen to see that key was "enter."
+	  if (event.which === 13) {
+
+	    // If so, run addTask.
+	    pagesearchclick();
+	  }
+	});
 
 	//Event Listeners==================================
 
@@ -54,25 +66,42 @@ $(document).ready(function(){
 		}
 	});
 
+	//Check whether both players have selected a choice
+	// var dbChat = db.ref().child(Chat);
+	// chathistory.on('child_added', function(data) {
+	// 	console.log("This is child added data: ", data);
+	// });
 
 	//Listening for changes in 'searches' node in firebase so display recent searches to user
-  	// db.ref('Chat').on('value', function(snapshot) {
-  	// 	$('#chatHistory').empty();
-  	// 	chathistory = [];
+  db.ref('Chat').on('value', function(snapshot) {
+  		$('#chatHistory').empty();
+  		chathistory = [];
 
-  	// 	//loop through array returned by firebase
-  	// 	snapshot.forEach(function(childSnapshot) {
-  	// 		//creating an array with the search saved search terms from firebase
-  	// 		chathistory.push(childSnapshot.val());
-  	// 	});
-  	// 	//loop through the array and append search term to Recent Searches div.
-  	// 	chathistory.forEach(function(item, i) {
-  	// 		var eachMessage = "<p>" + chathistory[i].name + ": " + chathistory[i].message + "</p>";
-  	// 		$('#chatHistory').append(eachMessage);
-  	// 	}); 			
+  		//loop through array returned by firebase
+  		snapshot.forEach(function(childSnapshot) {
+  			//creating an array with the search saved search terms from firebase
+  			chathistory.push(childSnapshot.val());
+  		});
+  		//loop through the array and append search term to Recent Searches div.
+  		chathistory.forEach(function(item, i) {
+  			var eachMessage = "<p>" + chathistory[i].name + ": " + chathistory[i].message + "</p>";
+  			$('#chatHistory').append(eachMessage);
+  		}); 			
 
-  	// });
+  });
 
+
+
+
+
+
+	
+	db.ref('choice_selections').on("value", function(snapshot) {
+		var choices = snapshot.val();
+		if (choices === 2) {
+			compareChoices();
+		}
+	});
 
 });
 
@@ -111,7 +140,7 @@ function addPlayer() {
 			 		dbPlayerCount.set(numPlayers);
 				}
 			});
-			
+			return;
 		}
 
 		//if player 1 exists but player two does not exist
@@ -137,7 +166,7 @@ function addPlayer() {
 			 		dbPlayerCount.set(numPlayers);
 				}
 			});
-			
+			return;
 		}
 
 		//if both player 1 and player 2 exist in db, alert msg
@@ -145,23 +174,12 @@ function addPlayer() {
 			alert("Sorry. Game is already in session");
 			return;
 		}
-
-		var amOnline = db.ref(".info/connected");
-			var userRef =  db.ref('presence/' + currPlayer);
-			amOnline.on('value', function(snapshot) {
-			  if (snapshot.val()) {
-			    userRef.onDisconnect().remove();
-			    userRef.set(true);
-			  }
-		});
-
 	});
 };
 
 
 function startGame() {
 	
-
 	//Show opponent
 	var oppName = db.ref('players/' + oppPlayer + '/name');
 	oppName.on('value', function(snapshot) {
@@ -174,14 +192,6 @@ function startGame() {
 	db.ref('choice_selections').set(choicesSelected);
 	db.ref('turn').set(1);
 
-
-	//Check whether both players have selected a choice
-	// db.ref('choice_selections').on("value", function(snapshot) {
-	// 	var choices = snapshot.val();
-	// 	if (choices === 2) {
-	// 		compareChoices();
-	// 	}
-	// });
 
 	db.ref('turn').on("value", function(snapshot) {
 		turn = snapshot.val();
@@ -228,14 +238,6 @@ function startGame() {
 
 };
 
-function resetChoice() {
-
-	var choice = "";
-	var dbChoice = db.ref('players/' + currPlayer + '/choice');
-	dbChoice.set(choice);
-
-}
-
 function selectChoice() {
 
 	//Update DB with player's selection
@@ -244,16 +246,12 @@ function selectChoice() {
 	dbChoice.set(choice);
 
 	//Update DB choice counter to indicate that player has made a choice
-	// var dbChoicesSelected = db.ref('choice_selections');
-	// dbChoicesSelected.once('value', function(snapshot) {
-	// 	choicesSelected = snapshot.val();
-	// 	choicesSelected++;
-	// 	db.ref('choice_selections').set(choicesSelected);
-	// });
-	db.ref('players/' + oppPlayer + '/choice').on('value', function(snapshot) {
-		compareChoices();
+	var dbChoicesSelected = db.ref('choice_selections');
+	dbChoicesSelected.once('value', function(snapshot) {
+		choicesSelected = snapshot.val();
+		choicesSelected++;
+		db.ref('choice_selections').set(choicesSelected);
 	});
-
 	//Hide the choices
 	$('#playerChoices').css("visibility", "hidden");
 
@@ -297,31 +295,21 @@ function compareChoices() {
 			playerWins++;
 			db.ref('players/' + currPlayer + '/wins').set(playerWins);
 			$('#vsText').html(playerName + " Wins!");
-			setTimeout(resetChoice, 3000);
 		}
 
-		else if ((playerChoice === "Scissors" && opponentChoice === "Rock") ||
-			(playerChoice === "Rock" && opponentChoice === "Paper") ||
-			(playerChoice === "Paper" && opponentChoice === "Scissors")) {
+		else if ((playerChoice === "Rock" && opponentChoice === "Rock") ||
+			(playerChoice === "Paper" && opponentChoice === "Paper") ||
+			(playerChoice === "Scissors" && opponentChoice === "Scissors")) {
+			$('#vsText').html("Tie Game!");
+		}
+		
+		else {
+			console.log("You Lose");
 			//Update Player Losses in Firebase
 			playerLosses++;
 			db.ref('players/' + currPlayer + '/losses').set(playerLosses);
 			//Update DOM with Player/Opponent Wins/Losses
 			$('#vsText').html(opponentName + " Wins!");
-			setTimeout(resetChoice, 3000);
-		}
-
-		else if ((playerChoice === "Scissors" && opponentChoice === "Scissors") ||
-			(playerChoice === "Rock" && opponentChoice === "Rock") ||
-			(playerChoice === "Paper" && opponentChoice === "Paper")) {
-			//Update Player Losses in Firebase
-			$('#vsText').html("Tie Game!");
-			setTimeout(resetChoice, 3000);
-		}
-		
-		else {
-			$('#vsText').html(" ");
-			
 		}
 		//reset choices selection counter to 0
 		dbChoicesSelected.set(0);
@@ -331,10 +319,9 @@ function compareChoices() {
 			var playerLosses = snapshot.child('players/' + currPlayer + '/losses').val();
 			var oppWins = snapshot.child('players/' + oppPlayer + '/wins').val();
 			var oppLosses = snapshot.child('players/' + oppPlayer + '/losses').val();
-			$('#oppWL').html("Wins: " + oppWins + " Losses: " + oppLosses);
 			$('#playerWL').html("Wins: " + playerWins + " Losses: " + playerLosses);
+			$('#oppWL').html("Wins: " + oppWins + " Losses: " + oppLosses);
 			console.log("Opponent Wins: " + oppWins + " Opponent Losses: " + oppLosses);
-			console.log("Player Wins: " + playerWins + " Player Losses: " + playerLosses);
 		});
 	});
 
@@ -358,5 +345,4 @@ function sendChat() {
 	$('#chatInput').val("");
 
 };
-
 
