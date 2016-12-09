@@ -78,10 +78,21 @@ li {
 
 li:hover {
 	background-color: #b58ebf;
-	poin
 }
 
 .wl {
 	
 	visibility: hidden;;
+}
+
+#chatHistory {
+	padding: 0px;
+	min-height: 10px;
+
+}
+
+
+#disconnectMsg {
+	color: white;
+	background-color: #5886A1;
 }

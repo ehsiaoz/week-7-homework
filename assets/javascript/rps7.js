@@ -26,9 +26,7 @@ var player = {
 
 var currPlayer = null;
 var oppPlayer = null;
-var numPlayers = null;
 var opponentName = "";
-var opponentNameDisconnect = "";
 var choicesSelected = 0;
 
 $(document).ready(function(){
@@ -47,13 +45,31 @@ $(document).ready(function(){
 
 	//Event Listeners==================================
 
-	//Check player count value in db. Trigger startGame function once value equal to 2
-	db.ref('player_count').on("value", function(snapshot) {
-		numPlayers = snapshot.val();
-		if (numPlayers === 2) {
+	//Check presence of two players in firebase. Trigger startGame function when there are two players
+	db.ref('players').on("value", function(snapshot) {
+		if((snapshot.child('1').exists() === true) && (snapshot.child('2').exists() === true)) {
 			startGame();
 		}
 	});
+
+
+	//Check for changes in chat. Append to DOM
+  	db.ref('Chat').on('value', function(snapshot) {
+  		$('#chatHistory').empty();
+  		chathistory = [];
+
+  		//loop through array returned by firebase
+  		snapshot.forEach(function(childSnapshot) {
+  			//creating an array with the search saved search terms from firebase
+  			chathistory.push(childSnapshot.val());
+  		});
+  		//loop through the array and append search term to Recent Searches div.
+  		chathistory.forEach(function(item, i) {
+  			var eachMessage = "<p>" + chathistory[i].name + ": " + chathistory[i].message + "</p>";
+  			$('#chatHistory').append(eachMessage);
+  		}); 			
+
+  	});
 
 
 });
@@ -97,51 +113,40 @@ function addPlayer() {
 		    	playerRef.onDisconnect().remove();
 		    	// playerRef.set(true);
 		  	}
-
 		});
-
+		//Add the player object
 		db.ref('players/' + currPlayer + '/').update(player);
+
+		//Modify the DOM
 		$('#playerName').html(playerName);
-		
 		$('#bar-button').hide();
 		$('#greeting').html("Hi " + player.name + "! You are player " + currPlayer);
 		//display wins and losses for player
 		$('#playerWL').css("visibility", "visible");
 
-		//Snapshot of DB for player count value and set value accordingly
-		db.ref('player_count').once('value').then(function(snapshot) {
-		 	numPlayers = snapshot.val();
-		 	if (numPlayers === null) {
-		 		numPlayers = 1;	
-		 		dbPlayerCount.set(numPlayers);
-		 	}
-		 	
-		 	else {
-		 		numPlayers ++;
-		 		dbPlayerCount.set(numPlayers);
-			}
-		});
 	});
-			
-}
+};
 
+function opponentDisconnect() {
+
+	$('#chatHistory').append("<p id=\"disconnectMsg\">" + opponentName + " has disconnected</p>");
+	$('#oppName').html("Waiting for Player " + oppPlayer);
+	$('#oppWL').css("visibility", "hidden");
+
+}
 
 //function to start game
 function startGame() {
-	
-	//reset wins and losses
-	db.ref().once("value", function(snapshot) {
-		var playerWins = snapshot.child('players/' + currPlayer + '/wins').val();
-		var playerLosses = snapshot.child('players/' + currPlayer + '/losses').val();
-		var oppWins = snapshot.child('players/' + oppPlayer + '/wins').val();
-		var oppLosses = snapshot.child('players/' + oppPlayer + '/losses').val();
-		$('#oppWL').html("Wins: 0 Losses: 0");
-		$('#playerWL').html("Wins: 0 Losses: 0");
-		db.ref('players/' + currPlayer + '/wins').set(0);
-		db.ref('players/' + currPlayer + '/losses').set(0);
-	});
 
-	$('#disconnectMsg').remove();
+	//clear the chat history window
+	$('#chatHistory').empty();
+	//reset player's wins and losses
+	$('#playerWL').html("Wins: 0 Losses: 0")
+	//reset opponent's wins and losses
+	$('#oppWL').html("Wins: 0 Losses: 0")
+	//show wins and losses
+	$('.wl').css("visibility", "visible");
+
 	//Show opponent
 	var oppName = db.ref('players/' + oppPlayer + '/name');
 	oppName.on('value', function(snapshot) {
@@ -149,45 +154,18 @@ function startGame() {
 		$('#oppName').html(opponentName);
 	});
 	
-	//show wins and losses
-	$('.wl').css("visibility", "visible");
-	
-
-	oppName.once('value', function(snapshot) {
-		opponentNameDisconnect = snapshot.val();
-	});
-
-	//Listen for presence of opponent
-	db.ref('players').on("value", function(snapshot) {
-		if(snapshot.child(oppPlayer).exists() === false) {
-			opponentDisconnect();
-		}
-	});
-
-	//Check for changes in chat. Append to DOM
-  	db.ref('Chat').on('value', function(snapshot) {
-  		
-  		$('#chatHistory').empty();
-  		chathistory = [];
-
-  		//loop through array returned by firebase
-  		snapshot.forEach(function(childSnapshot) {
-  			//creating an array with the search saved search terms from firebase
-  			chathistory.push(childSnapshot.val());
-  		});
-  		//loop through the array and append search term to Recent Searches div.
-  		chathistory.forEach(function(item, i) {
-  			var eachMessage = "<p class=\"chatMsg\">" + chathistory[i].name + ": " + chathistory[i].message + "</p>";
-  			$('#chatHistory').append(eachMessage);
-  		}); 			
-
-  	});
-	
 	
 	// db.ref('choice_selections').set(choicesSelected);
 	//Set turn to 1
 	db.ref('turn').set(1);
 
+	//Listen for presence of opponent
+	db.ref().on("value", function(snapshot) {
+
+		if(snapshot.child('players/' + oppPlayer).exists() === false) {
+			opponentDisconnect();
+		}
+	});
 
 	//Check whether both players have selected a choice
 	// db.ref('choice_selections').on("value", function(snapshot) {
@@ -235,22 +213,11 @@ function startGame() {
 					$('#turn-indicator').html("Waiting for " + opponentName + " to choose.");
 				});
 		}
-	});	
-}
+	});
+	
 
-function opponentDisconnect() {
 
-	$('#chatHistory').append("<p class=\"chatMsg\" id=\"disconnectMsg\">" + opponentNameDisconnect + " has disconnected</p>");
-	$('#oppName').html("Waiting for Player " + oppPlayer);
-	$('#oppWL').css("visibility", "hidden");
-
-	db.ref('player_count').once('value').then(function(snapshot) {
-		 	numPlayers = snapshot.val();
-		 		numPlayers--;	
-		 		dbPlayerCount.set(numPlayers);
-		});
-}
-
+};
 //function to reset choices
 function resetChoice() {
 
@@ -370,8 +337,10 @@ function sendChat() {
 		time: firebase.database.ServerValue.TIMESTAMP
 	};
 	
-	var dbChat =  db.ref('Chat');
-	dbChat.push(chat);
+	db.ref().once('value').then(function(snapshot) {
+
+			db.ref('Chat/').push(chat);
+	});
 
 	$('#chatInput').val("");
 
