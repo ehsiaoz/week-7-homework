@@ -1,12 +1,7 @@
 
 .page-header {
 	text-align: center;
-	background-color: #5886A1;
-	line-height: 49px;
-	font-size: 30px;
-	color: white;
 }
-
 
 #bar-button {
 	text-align: center;
@@ -24,10 +19,6 @@
 	margin-top: 20px;
 	width: 50%;
 	margin-left: 25%;
-}
-
-#chatTitle {
-	font-weight: bolder;
 }
 
 .input-group {
@@ -55,20 +46,11 @@ h4 {
 	font-weight: bold;
 }
 
-#vsText {
-	line-height: 130px;
-	font-weight: bold;
-}
-
-.player-name {
-	font-weight: bold;
-}
-
 ul {
 	list-style-type: none;
 	font-size: 20px;
 	padding-left: 0;
-	visibility: hidden;;
+	display: none;
     
 }
 
@@ -77,22 +59,6 @@ li {
 }
 
 li:hover {
-	background-color: #b58ebf;
-}
-
-.wl {
-	
-	visibility: hidden;;
-}
-
-#chatHistory {
-	padding: 0px;
-	min-height: 100px;
-
-}
-
-
-#disconnectMsg {
-	color: white;
-	background-color: #5886A1;
+	background-color: #E3E3E3;
+	poin
 }
